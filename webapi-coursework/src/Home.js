@@ -16,23 +16,28 @@ const HomePage = () => {
   };
 
   return (
-    <form className="h-100">
+    <form className="h-100" style={{ textAlign: "center" }}>
+      <div className="container mt-4">
+        <span className="HeaderName">
+          <b>HOLIDAY CENTRAL - FLIGHT SEARCH</b>
+        </span>
+      </div>
       <div className="d-flex justify-content-center align-items-center h-100">
         <div>
           <button
-            className="btn btn-primary mx-2"
+            className="btn btn-dark mx-2 searchBtn"
             onClick={handleFlightReservations}
           >
             Flight Ticket Reservations (Round Trips)
           </button>
           <button
-            className="btn btn-secondary mx-2"
+            className="btn btn-dark mx-2 searchBtn"
             onClick={handleHotelReservations}
           >
             Hotel Reservations
           </button>
           <button
-            className="btn btn-success mx-2"
+            className="btn btn-dark mx-2 searchBtn"
             onClick={handlePackageReservations}
           >
             Holiday Packages (Flight + Hotel Reservations)

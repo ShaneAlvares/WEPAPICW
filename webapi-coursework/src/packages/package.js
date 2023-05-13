@@ -1,23 +1,19 @@
-
 import React from "react";
 import axios from "axios";
-import 'bootstrap/dist/css/bootstrap.min.css';
+import "bootstrap/dist/css/bootstrap.min.css";
 import { useNavigate } from "react-router-dom";
 
 function Package() {
-
-
-  const [searchTerm, setSearchTerm] = React.useState('');
-  const [filter1, setFilter1] = React.useState('');
-  const [filter2, setFilter2] = React.useState('');
-  const [filter3, setFilter3] = React.useState('');
+  const [searchTerm, setSearchTerm] = React.useState("");
+  const [filter1, setFilter1] = React.useState("");
+  const [filter2, setFilter2] = React.useState("");
+  const [filter3, setFilter3] = React.useState("");
   const [packages, setPackages] = React.useState(null);
-  const [inputValue, setInputValue] = React.useState('');
-  const [SearchType, setSearchType] = React.useState('');
-  
+  const [inputValue, setInputValue] = React.useState("");
+  const [SearchType, setSearchType] = React.useState("");
 
   const client = axios.create({
-    baseURL: "http://localhost:8080/packages"
+    baseURL: "http://localhost:8080/packages",
   });
   React.useEffect(() => {
     async function getPackages() {
@@ -27,26 +23,26 @@ function Package() {
     getPackages();
   }, []);
 
-  const handleSearch = event => {
+  const handleSearch = (event) => {
     setSearchTerm(event.target.value);
   };
 
-  const handleFilter1 = event => {
+  const handleFilter1 = (event) => {
     setFilter1(event.target.value);
   };
 
-  const handleFilter2 = event => {
+  const handleFilter2 = (event) => {
     setFilter2(event.target.value);
   };
 
-  const handleFilter3 = event => {
+  const handleFilter3 = (event) => {
     setFilter3(event.target.value);
   };
 
   const handleClick = (paramValue) => {
     // Do something with the parameter value
     console.log(SearchType);
-    if (SearchType == 'price') {
+    if (SearchType == "price") {
       async function getPackages() {
         const response = await client.get(`?price=${paramValue}`);
         setPackages(response.data);
@@ -55,8 +51,7 @@ function Package() {
 
       console.log(paramValue);
     }
-    if (SearchType == 'duration') {
-
+    if (SearchType == "duration") {
       async function getPackages() {
         const response = await client.get(`?duration=${paramValue}`);
         setPackages(response.data);
@@ -65,7 +60,7 @@ function Package() {
 
       console.log(paramValue);
     }
-    if (SearchType == 'destination') {
+    if (SearchType == "destination") {
       async function getPackages() {
         const response = await client.get(`?destination=${paramValue}`);
         setPackages(response.data);
@@ -73,9 +68,8 @@ function Package() {
       getPackages();
 
       console.log(paramValue);
-
     }
-    if (SearchType == 'capacity') {
+    if (SearchType == "capacity") {
       async function getPackages() {
         const response = await client.get(`?capacity=${paramValue}`);
         setPackages(response.data);
@@ -83,9 +77,8 @@ function Package() {
       getPackages();
 
       console.log(paramValue);
-
     }
-    if (SearchType == 'specialty') {
+    if (SearchType == "specialty") {
       async function getPackages() {
         const response = await client.get(`?specialty=${paramValue}`);
         setPackages(response.data);
@@ -93,22 +86,20 @@ function Package() {
       getPackages();
 
       console.log(paramValue);
-
     }
-
-  }
+  };
 
   const handleChange = (event) => {
     setInputValue(event.target.value);
-  }
+  };
 
   const handleSearchTypeChange = (event) => {
     setSearchType(event.target.value);
-  }
- 
-  // let navigate = useNavigate(); 
-  // const routeChange = (id) =>{ 
-  //   let path = `/singlePackageView`; 
+  };
+
+  // let navigate = useNavigate();
+  // const routeChange = (id) =>{
+  //   let path = `/singlePackageView`;
   //   navigate(path);
   // }
   const spacing = 6;
@@ -117,9 +108,8 @@ function Package() {
     marginRight: `${spacing}em`,
   };
 
-
   const filteredData = packages?.filter(
-    item =>
+    (item) =>
       (filter1 === "" || item.duration === parseInt(filter1)) &&
       (filter2 === "" || item.rating === parseInt(filter2)) &&
       (filter3 === "" || item.price <= parseInt(filter3))
@@ -127,14 +117,19 @@ function Package() {
 
   //  const filteredData = packages
 
-  if (!packages) return "No Packeges!"
+  if (!packages) return "Packeges Not Available!";
   return (
     <div className="container">
-        <div>
+      <div className="header">
+        <span className="HeaderName">
+          <b>HOLIDAY CENTRAL - PACKAGE SEARCH</b>
+        </span>
+      </div>
+      <div className="search-container">
         <select
           value={SearchType}
           onChange={handleSearchTypeChange}
-          style={divStyle}
+          className="search-select"
         >
           <option value="">Search Type</option>
           <option value="destination">Destination</option>
@@ -143,13 +138,26 @@ function Package() {
           <option value="specialty">Specialty</option>
         </select>
 
-        <input type="text" placeholder="Search" value={inputValue} onChange={handleChange} style={divStyle} />
-        <button className="float-right" onClick={() => handleClick(inputValue)} >Search</button >
-      </div><br></br>
-      <div className="row mb-3">
-        <div className="col">
+        <div className="search-input-container">
+          <input
+            type="text"
+            placeholder="Search"
+            value={inputValue}
+            onChange={handleChange}
+            className="search-input"
+          />
+          <button
+            className="search-btn"
+            onClick={() => handleClick(inputValue)}
+          >
+            Search
+          </button>
+        </div>
+      </div>
+      <div className="filters-container">
+        <div className="filters">
           <select
-            className="form-control"
+            className="form-control filter-select"
             value={filter1}
             onChange={handleFilter1}
           >
@@ -166,9 +174,9 @@ function Package() {
             <option value="10">10</option>
           </select>
         </div>
-        <div className="col">
+        <div className="filters">
           <select
-            className="form-control"
+            className="form-control filter-select"
             value={filter2}
             onChange={handleFilter2}
           >
@@ -180,18 +188,17 @@ function Package() {
             <option value="5">5</option>
           </select>
         </div>
-        <div className="col">
+        <div className="filters">
           <input
             type="text"
-            className="form-control"
+            className="form-control filter-input"
             placeholder="Filter by Price"
             value={filter3}
             onChange={handleFilter3}
           />
         </div>
       </div>
-    
-      <table className="table">
+      <table className="table table-striped table-hover">
         <thead>
           <tr>
             <th>Name</th>
@@ -199,18 +206,26 @@ function Package() {
             <th>Duration (Days)</th>
             <th>Rating</th>
             <th>Price $</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
-          {filteredData.map(item => (
+          {filteredData.map((item) => (
             <tr key={item._id}>
               <td>{item.name}</td>
               <td>{item.destination}</td>
               <td>{item.duration}</td>
               <td>{item.rating}</td>
               <td>{item.price}</td>
-              <td><a class="btn btn-primary btn-sm" type="button" href={'/package/innerPackageView/'+ item._id }>View More</a></td>
-              
+              <td>
+                <a
+                  className="btn btn-primary btn-sm"
+                  type="button"
+                  href={"/package/innerPackageView/" + item._id}
+                >
+                  View More
+                </a>
+              </td>
             </tr>
           ))}
         </tbody>

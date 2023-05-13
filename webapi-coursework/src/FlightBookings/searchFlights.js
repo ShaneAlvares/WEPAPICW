@@ -23,16 +23,13 @@ const SearchFlights = () => {
 
   const [cartCount, setCartCount] = useState(0);
 
-  useEffect(()=>{
-    if(localStorage.getItem('cartData') == undefined){
+  useEffect(() => {
+    if (localStorage.getItem("cartData") == undefined) {
       setCartCount(0);
-    }else{
+    } else {
       setCartCount(1);
     }
-  },[cartCount])
-
-
-  
+  }, [cartCount]);
 
   //function handlings
 
@@ -42,10 +39,9 @@ const SearchFlights = () => {
       selectedDepartureFlight.length == 0
     ) {
       alert("Please select a round trip to add to cart that");
-    }else if(cartCount == 1){
+    } else if (cartCount == 1) {
       alert("Already you cart is filled. Please checkout them for continoue.");
-    }
-    else {
+    } else {
       // console.log(selectedDepartureFlight);
       // // console.log(selectedArrivalFlight);
       // let cartArr = [];
@@ -63,6 +59,7 @@ const SearchFlights = () => {
       // cartArr.push(cart);
       // await setFlightCart(cart);
       // console.log(cartArr);
+      alert("Added to Cart");
       localStorage.setItem("cartData", JSON.stringify(cart));
       setCartCount(1);
       // localStorage.setItem("cartData",cartArr );
@@ -463,7 +460,7 @@ const SearchFlights = () => {
               {locattions.map((item) => {
                 return item.id == departureAirport ? item.name : "";
               })}{" "}
-              ->{" "}
+              -{" "}
               {locattions.map((item) => {
                 return item.id == arrivalAirport ? item.name : "";
               })}
@@ -532,7 +529,7 @@ const SearchFlights = () => {
               {locattions.map((item) => {
                 return item.id == arrivalAirport ? item.name : "";
               })}{" "}
-              ->{" "}
+              -{" "}
               {locattions.map((item) => {
                 return item.id == departureAirport ? item.name : "";
               })}
@@ -591,8 +588,10 @@ const SearchFlights = () => {
   };
 
   const renderAddToCartSection = () => {
-    if(allDepartureFlightItems.length > 0 || allArrivalFlightItems.length > 0)
-    {
+    if (
+      allDepartureFlightItems.length > 0 ||
+      allArrivalFlightItems.length > 0
+    ) {
       return (
         <div className="row mt-4">
           <div className="divPadingZero">
@@ -606,7 +605,6 @@ const SearchFlights = () => {
         </div>
       );
     }
-    
   };
 
   return (
@@ -614,8 +612,18 @@ const SearchFlights = () => {
       <span className="HeaderName">
         <b>HOLIDAY CENTRAL - FLIGHT SEARCH</b>
       </span>
-      <span className="cartItemIcon" onClick={() => navigate("/flight/cart")}>
+      <span
+        className="cartItemIcon"
+        style={{ marginLeft: "10px" }}
+        onClick={() => navigate("/flight/cart")}
+      >
         CART <span className="cartCount">{cartCount}</span>
+      </span>
+      <span
+        className="cartItemIcon"
+        onClick={() => navigate("/flight/reservations")}
+      >
+        ALL RESERVATION
       </span>
       {renderSearchArea()}
       {renderErrorMsgSection()}

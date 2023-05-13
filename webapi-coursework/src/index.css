@@ -120,3 +120,6 @@
   width: 400px;
   text-align: end;
 }
+.Booked{
+  background-color: red !important;
+}

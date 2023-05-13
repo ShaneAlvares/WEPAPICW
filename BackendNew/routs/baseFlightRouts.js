@@ -1,9 +1,9 @@
-var express = require('express');
+var express = require("express");
 // const app = express();
 var router = express.Router();
 // var path = require('path');
 // const bodyParser = require('body-parser');
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 // // mongoose.connect('mongodb+srv://apiwebcw:W4ZPk1AWIGmrR8zZ@holidaycentral.7bwifhs.mongodb.net/HolidayCentral', { useNewUrlParser: true, useUnifiedTopology: true });
 // // const db = mongoose.connection;
@@ -29,7 +29,7 @@ const flightSchema = {
 const flightreservationsSechema = {
   user: {
     name: String,
-    contactNo: String
+    contactNo: String,
   },
   flightID: String,
   flightDetails: {
@@ -37,15 +37,16 @@ const flightreservationsSechema = {
   },
   link: String,
   seatNo: String,
-  Meal: String
+  Meal: String,
 };
 
 const Flight = mongoose.model("flights", flightSchema);
-const FlightReservations = mongoose.model("flightreservations", flightreservationsSechema);
-
+const FlightReservations = mongoose.model(
+  "flightreservations",
+  flightreservationsSechema
+);
 
 router.post("/getFlights", async function (req, res) {
-
   console.log(req.body);
 
   let depatureFindObj = {
@@ -59,13 +60,11 @@ router.post("/getFlights", async function (req, res) {
     departureDate: req.body.arrivalDate,
   };
 
-  if(req.body.class)
-  {
+  if (req.body.class) {
     depatureFindObj.class = req.body.class;
     arrivalFindObj.class = req.body.class;
   }
-  if(req.body.airline)
-  {
+  if (req.body.airline) {
     depatureFindObj.airline = req.body.airline;
     arrivalFindObj.airline = req.body.airline;
   }
@@ -99,7 +98,7 @@ router.post("/checkout", async function (req, res) {
 
     req.body.departure.date = new Date();
     req.body.arrival.date = new Date();
-    
+
     let pushDeparture = await FlightReservations.create(req.body.departure);
     let pushArrival = await FlightReservations.create(req.body.arrival);
 
@@ -111,24 +110,35 @@ router.post("/checkout", async function (req, res) {
   }
 });
 
+router.get("/getFlightsBookedSeats/:id", async function (req, res) {
+  try {
+    let flightID = {
+      flightID: req.params.id,
+    };
+    let seatsBooked = await FlightReservations.find(flightID);
 
+    if (seatsBooked.length == 0) {
+      res.send("No reservations");
+    } else {
+      res.send(seatsBooked);
+    }
+  } catch (err) {
+    console.log(err);
+  }
+});
 
-// app.post("/getFlightsBookedSeats", async function (req, res) {
-//   try {
-//     let results = {};
-//     let seatsBooked = await Flightresseats.find(req.body);
+router.get("/reservations", async function (req, res) {
+  try {
+    let reservations = await FlightReservations.find({});
 
-//     if (seatsBooked.length == 0) {
-//       res.send("No any round seats being booked");
-//     } else {
-//       results.seatsBooked = seatsBooked;
-//       res.send(results);
-//     }
-//   } catch (err) {
-//     console.log(err);
-//   }
-// });
-
-
+    if (reservations.length == 0) {
+      res.send("No reservations");
+    } else {
+      res.send(reservations);
+    }
+  } catch (err) {
+    console.log(err);
+  }
+});
 
 module.exports = router;

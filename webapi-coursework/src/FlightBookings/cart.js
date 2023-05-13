@@ -20,6 +20,9 @@ const Cart = () => {
   const [mealDeparture, setMealDeparture] = useState();
   const [mealArrival, setMealArrival] = useState();
 
+  const [departureBookedSeats, setDepartureBookedSeats] = useState([]);
+  const [arrivalBookedSeats, setArrivalBookedSeats] = useState([]);
+
   const navigate = useNavigate();
 
   const meals = [
@@ -37,27 +40,64 @@ const Cart = () => {
     { id: 6, name: "I 2" },
   ];
 
+  const getDepartuteBookedSeats = (id) => {
+    axios
+      .get("http://localhost:8080/flights/getFlightsBookedSeats/" + id, {})
+      .then((response) => {
+        if (response.status == 200 && response.data != "No reservations") {
+          let seats = response.data.map((item) => item.seatNo);
+          setDepartureBookedSeats(seats);
+        } else {
+          setDepartureBookedSeats([]);
+        }
+      })
+      .catch((error) => {
+        // Handle error
+        return [];
+        console.log(error);
+      });
+  };
+
+  const getArrivalBookedSeats = (id) => {
+    axios
+      .get("http://localhost:8080/flights/getFlightsBookedSeats/" + id, {})
+      .then((response) => {
+        if (response.status == 200 && response.data != "No reservations") {
+          let seats = response.data.map((item) => item.seatNo);
+          setArrivalBookedSeats(seats);
+        } else {
+          setArrivalBookedSeats([]);
+        }
+      })
+      .catch((error) => {
+        // Handle error
+        return [];
+        console.log(error);
+      });
+  };
+
   useEffect(() => {
     let cart = JSON.parse(localStorage.getItem("cartData"));
-    if(cart != null)
-    {
+    if (cart != null) {
       setCartData(cart);
       setDepartureFlights(cart.departureFlights);
       setArrivalFlights(cart.ArrivalFlights);
-  
+
       setPrice(
         parseFloat(cart.ArrivalFlights[0].price) +
           parseFloat(cart.departureFlights[0].price)
       );
-  
+
       setLocattions(cart.locations);
       setAirlines(cart.airlines);
       setCabinClass(cart.classes);
-  
+
       setDepartureAirport(cart.departurePlace);
       setArrivalAirport(cart.arrivalPlace);
+
+      getDepartuteBookedSeats(cart.departureFlights[0].id);
+      getArrivalBookedSeats(cart.ArrivalFlights[0].id);
     }
-    
   }, []);
 
   const handleDepartureMealSelection = (event) => {
@@ -68,25 +108,29 @@ const Cart = () => {
   };
 
   const handleCheckout = () => {
-
-    if(fullName == ""){
+    if (fullName == "") {
       alert("Please enter the full name");
-    }else if(contactNo == ""){
-      alert("Please enter a contact number.")
-    }else if(!contactNo.match(/^[0-9]+$/)){
+    } else if (contactNo == "") {
+      alert("Please enter a contact number.");
+    } else if (!contactNo.match(/^[0-9]+$/)) {
       alert("Please recheck the contact number");
-    }
-    else if(contactNo.length != 10){
+    } else if (contactNo.length != 10) {
       alert("Please recheck the contact number");
-    }else if(bookedDepartureSeates.seatID == undefined || bookedDepartureSeates.seatID == null){
+    } else if (
+      bookedDepartureSeates.seatID == undefined ||
+      bookedDepartureSeates.seatID == null
+    ) {
       alert("Please select a seat in departure flight");
-    }else if(bookedArrivalSeates.seatID == undefined || bookedArrivalSeates.seatID == null){
+    } else if (
+      bookedArrivalSeates.seatID == undefined ||
+      bookedArrivalSeates.seatID == null
+    ) {
       alert("Please select a seat in arrival flight");
-    }else if(mealDeparture == "" || mealDeparture == null){
+    } else if (mealDeparture == "" || mealDeparture == null) {
       alert("Please select a meal in departure flight");
-    }else if(mealArrival == "" || mealArrival == null){
+    } else if (mealArrival == "" || mealArrival == null) {
       alert("Please select a meal in arrival flight");
-    }else{
+    } else {
       let identifier = Math.random();
 
       let checkoutD = {};
@@ -98,7 +142,7 @@ const Cart = () => {
       checkoutD.link = identifier;
       checkoutD.seatNo = bookedDepartureSeates.seatID;
       checkoutD.Meal = mealDeparture;
-  
+
       let checkoutA = {};
       checkoutA.user = {};
       checkoutA.user.name = fullName;
@@ -108,19 +152,23 @@ const Cart = () => {
       checkoutA.link = identifier;
       checkoutA.seatNo = bookedArrivalSeates.seatID;
       checkoutA.Meal = mealArrival;
-  
+
       let records = {};
       records.departure = checkoutD;
       records.arrival = checkoutA;
-  
+
       console.log(records.departure);
-  
+
       axios
         .post("http://localhost:8080/flights/checkout", records)
         .then((response) => {
-          alert("You have reserved the flight booking successfully");
-          setCartData(null);
-          localStorage.removeItem('cartData');
+          if (response.status == 200) {
+            // alert("You have reserved the flight booking successfully");
+            setCartData(null);
+            localStorage.removeItem("cartData");
+
+            navigate("/flight/checkout");
+          }
         })
         .catch((error) => {
           // Handle error
@@ -283,11 +331,24 @@ const Cart = () => {
                         {seats.map((item, index) => {
                           return (
                             <button
+                              className={
+                                departureBookedSeats.includes(
+                                  item.id.toString()
+                                )
+                                  ? "Booked"
+                                  : "NotBooked"
+                              }
                               data-seatid={item.id}
                               data-seatname={item.name}
                               key={index}
                               data-departureflightid="true"
-                              onClick={handleDepartureSeatPosition}
+                              onClick={
+                                departureBookedSeats.includes(
+                                  item.id.toString()
+                                )
+                                  ? null
+                                  : handleDepartureSeatPosition
+                              }
                             >
                               {item.name}
                             </button>
@@ -385,6 +446,11 @@ const Cart = () => {
                         {seats.map((item, index) => {
                           return (
                             <button
+                              className={
+                                arrivalBookedSeats.includes(item.id.toString())
+                                  ? "Booked"
+                                  : "NotBooked"
+                              }
                               data-seatid={item.id}
                               data-seatname={item.name}
                               key={index}
@@ -455,7 +521,10 @@ const Cart = () => {
           <br></br>
           <span
             className="cartItemIcon mb-4"
-            onClick={() => {setCartData(null); localStorage.removeItem('cartData');}}
+            onClick={() => {
+              setCartData(null);
+              localStorage.removeItem("cartData");
+            }}
             style={{ background: "red", color: "white" }}
           >
             CLEAR CART
@@ -472,9 +541,9 @@ const Cart = () => {
           {renderCheckoutForm()}
         </div>
       );
-    }else{
-     return(
-      <div>
+    } else {
+      return (
+        <div>
           <span className="HeaderName">
             <b>HOLIDAY CENTRAL - CART</b>
           </span>
@@ -499,7 +568,7 @@ const Cart = () => {
             </div>
           </div>
         </div>
-     )
+      );
     }
   };
 
